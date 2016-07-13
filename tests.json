@@ -110,7 +110,7 @@
 			"currentHelper": "normal",
 			"helperAttributes": {},
 			"time": 1465918912676,
-			"name": "Unsupported Media Type is XML",
+			"name": "Unsupported Media Type ",
 			"collectionId": "3472467b-8823-6116-e405-8e2e89dc962c",
 			"responses": [],
 			"rawModeData": "[\n  {\n    \"messageType\": \"contentTypeTest\",\n    \"ota\": \"contentTypeTest\",\n    \"messageTemplate\": \"contentTypeTest\",\n    \"endpoint\": \"contentTypeTest\"\n    }\n]",
