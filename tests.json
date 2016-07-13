@@ -53,7 +53,7 @@
 			"method": "PUT",
 			"data": [],
 			"dataMode": "raw",
-			"tests": "var data = JSON.parse(responseBody);\r\ntests[\"Status code should be 415 and found \" +responseCode.code] = responseCode.code === 415;\r\ntests[\"Unsupported Media Type XML is \" + data.message] = data.message===\"Incorrect content-type. Use application/json\";\r\n",
+			"tests": "var data = JSON.parse(responseBody);\r\ntests[\"Status code should be 415 and found \" +responseCode.code] = responseCode.code === 400;\r\ntests[\"Unsupported Media Type XML is \" + data.message] = data.message===\"Incorrect content-type. Use application/json\";\r\n",
 			"currentHelper": "normal",
 			"helperAttributes": {},
 			"time": 1465918928793,
