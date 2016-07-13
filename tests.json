@@ -12,42 +12,81 @@
 			"description": "",
 			"item": [
 				{
-					"name": "<Amenity> Get list of Amenity",
+					"name": "<Amenity> Create new amenity and verify Location",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
-								"exec": "var data = JSON.parse(responseBody);\r\ntests[\"Status code should be 200 and found \" + responseCode.code] = responseCode.code === 200;\r\npostman.setGlobalVariable(\"capture_contentType\", postman.getResponseHeader(\"Content-Type\"));\r\ntests[\"Content-Type is JSON\"] = globals[\"capture_contentType\"]==\"application/json; charset=utf-8\";"
+								"exec": "tests[\"Amenity Created. Response should be 201 and found \" + responseCode.code ] = responseCode.code === 201;\n\npostman.setEnvironmentVariable(\"newAmenityId\", postman.getResponseHeader(\"Location\"));\ntests[\"New AmenityId is \" + environment[\"newAmenityId\"]] = environment[\"newAmenityId\"] == postman.getResponseHeader(\"Location\");"
 							}
 						}
 					],
 					"request": {
 						"url": "{{baseURI}}/amenity",
-						"method": "GET",
+						"method": "POST",
 						"header": [
 							{
 								"key": "Accept",
-								"value": "application/JSON",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
 								"description": ""
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{\r\n  \"name\": \"{{name}}\",\r\n  \"category\": [\r\n    \"Mobile\"\r\n  ]\r\n}"
 						},
 						"description": ""
 					},
 					"response": []
 				},
 				{
-					"name": "<Amenity> Create new amenity, includedCreated is TRUE",
+					"name": "<Amenity/{amenityId}> Get details for an amenity ",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
-								"exec": "tests[\"Amenity Created. Response should be 201 and found \" + responseCode.code ] = responseCode.code === 201;"
+								"exec": "var data = JSON.parse(responseBody);\ntests[\"Amenity Created. Response should be 200 and found \" + responseCode.code ] = responseCode.code === 200;\n\nvar schema = {\n        \"properties\": {\n         \"id\": {\n         \"type\": \"string\"\n         }, \n         \"name\": {\n         \"type\": \"string\"\n         }, \n         \"categories\": {\n         \"type\": \"array\"\n         }, \n      }\n};\n\n\nvar result = tv4.validateResult(data, schema);\ntests[\"Schema validation. Verify id, name and catagory\"] = result.valid;\n\ntests [\"Name is ==> \" +  data.name] = data.name = environment[\"name\"]\n\n\n"
+							}
+						}
+					],
+					"request": {
+						"url": "{{newAmenityId}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"iPhone Charger\",\r\n  \"category\": [\r\n    \"Mobile\"\r\n  ],\r\n  \"associatedReference\": [\r\n    \"apple\"\r\n  ]\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "<Amenity> New amenity without name",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": "tests[\"Without name field should give you 400 and found ==>>\" + responseCode.code ] = responseCode.code ===400;"
 							}
 						}
 					],
@@ -68,6 +107,118 @@
 						],
 						"body": {
 							"mode": "raw",
+							"raw": "{\r\n  \"name\": null,\r\n  \"category\": [\r\n    \"Mobile\"\r\n  ]\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "<Amenity> Get list of Amenity",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": "var data = JSON.parse(responseBody);\r\ntests[\"Status code should be 200 and found \" + responseCode.code] = responseCode.code === 200;\r\npostman.setGlobalVariable(\"capture_contentType\", postman.getResponseHeader(\"Content-Type\"));\r\ntests[\"Content-Type is JSON\"] = globals[\"capture_contentType\"]==\"application/json; charset=utf-8\";"
+							}
+						}
+					],
+					"request": {
+						"url": "{{baseURI}}/amenity",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/JSON",
+								"description": ""
+							},
+							{
+								"key": "Accept-Language",
+								"value": "es-mx",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "<Amenity> Language Test",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": "var data = JSON.parse(responseBody);\r\ntests[\"Status code should be 200 and found \" + responseCode.code] = responseCode.code === 200;\r\npostman.setGlobalVariable(\"capture_contentType\", postman.getResponseHeader(\"Content-Type\"));\r\ntests[\"Content-Type is JSON\"] = globals[\"capture_contentType\"]==\"application/json; charset=utf-8\";"
+							}
+						}
+					],
+					"request": {
+						"url": "{{baseURI}}/amenity",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/JSON",
+								"description": ""
+							},
+							{
+								"key": "Accept-Language",
+								"value": "es-MX",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "<Amenity/{amenityId}> Verify Accept-Language",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": "var data = JSON.parse(responseBody);\ntests[\"Response should be 200 and found \" + responseCode.code ] = responseCode.code === 200;\n\nvar schema = {\n        \"properties\": {\n         \"id\": {\n         \"type\": \"string\"\n         }, \n         \"name\": {\n         \"type\": \"string\"\n         }, \n         \"categories\": {\n         \"type\": \"array\"\n         }, \n      }\n};\n\n\nvar result = tv4.validateResult(data, schema);\ntests[\"Schema validation. Verify id, name and catagory\"] = result.valid;\n\n\n"
+							}
+						}
+					],
+					"request": {
+						"url": "{{baseURI}}/amenity/{{spanishLanugage}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Accept-Language",
+								"value": "es-mx",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
 							"raw": "{\r\n  \"name\": \"iPhone Charger\",\r\n  \"category\": [\r\n    \"Mobile\"\r\n  ],\r\n  \"associatedReference\": [\r\n    \"apple\"\r\n  ]\r\n}"
 						},
 						"description": ""
@@ -75,18 +226,18 @@
 					"response": []
 				},
 				{
-					"name": "<Amenity/{amenityId}> Get details for an amenity ",
+					"name": "<Amenity> Query for property",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
-								"exec": "var data = JSON.parse(responseBody);\ntests[\"Amenity Created. Response should be 200 and found \" + responseCode.code ] = responseCode.code === 200;\n\nvar schema = {\n        \"properties\": {\n         \"id\": {\n         \"type\": \"string\"\n         }, \n         \"name\": {\n         \"type\": \"string\"\n         }, \n         \"categories\": {\n         \"type\": \"array\"\n         }, \n      }\n};\n\n\nvar result = tv4.validateResult(data, schema);\ntests[\"Schema validation. Verify id, name and catagory\"] = result.valid;\n\n\n"
+								"exec": "var testData = JSON.parse(responseBody);\ntests[\"Query for property. Response code should be 200 and found \" + responseCode.code ] = responseCode.code === 200;\ntests[\"entityType should be Property and found \" +  testData.data[0].categories[0].entityType] = testData.data[0].categories[0].entityType === \"Property\";\n\npostman.setEnvironmentVariable(\"property1\", testData.data[0].id);\npostman.setEnvironmentVariable(\"property2\", testData.data[1].id);"
 							}
 						}
 					],
 					"request": {
-						"url": "{{baseURI}}/amenity/{{amenityId}}",
+						"url": "{{baseURI}}/amenity",
 						"method": "GET",
 						"header": [
 							{
@@ -102,7 +253,75 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"name\": \"iPhone Charger\",\r\n  \"category\": [\r\n    \"Mobile\"\r\n  ],\r\n  \"associatedReference\": [\r\n    \"apple\"\r\n  ]\r\n}"
+							"raw": "{\r\n  \"name\": \"iPhone Charger\",\r\n  \"category\": [\r\n    \"Mobile\"\r\n  ]\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "<Amenity> Query for ratePlan",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": "var testData = JSON.parse(responseBody);\ntests[\"Query for ratePlan. Response code should be 200 and found \" + responseCode.code ] = responseCode.code === 200;\ntests[\"entityType should be Rate Plan and found \" +  testData.data[0].categories[0].entityType] = testData.data[0].categories[0].entityType === \"Rate Plan\";\n\npostman.setEnvironmentVariable(\"ratePlan1\", testData.data[0].id);\npostman.setEnvironmentVariable(\"ratePlan2\", testData.data[1].id);"
+							}
+						}
+					],
+					"request": {
+						"url": "{{baseURI}}/amenity?q=entitytype=ratePlan",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"iPhone Charger\",\r\n  \"category\": [\r\n    \"Mobile\"\r\n  ]\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "<Amenity> Query for roomClass",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": "var testData = JSON.parse(responseBody);\ntests[\"Query for roomClass. Response code should be 200 and found \" + responseCode.code ] = responseCode.code === 200;\ntests[\"entityType should be Room Class and found \" +  testData.data[0].categories[0].entityType] = testData.data[0].categories[0].entityType === \"Room Class\";\n\n\npostman.setEnvironmentVariable(\"roomClass1\", testData.data[0].id);\npostman.setEnvironmentVariable(\"roomClass2\", testData.data[1].id);"
+							}
+						}
+					],
+					"request": {
+						"url": "{{baseURI}}/amenity?q=entitytype=roomClass",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"iPhone Charger\",\r\n  \"category\": [\r\n    \"Mobile\"\r\n  ]\r\n}"
 						},
 						"description": ""
 					},
@@ -142,7 +361,41 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\r\n \"1002\", \"1001\", \"1003\", \"1070\"\r\n]"
+							"raw": "[\r\n \"{{property1}}\", \"{{property2}}\"\r\n]"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "<Property/{propertyId}> More than 20 amenityId",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": "tests[\"Adding more than 20+ amenities should give 400 and found ==> \" + responseCode.code ] = responseCode.code === 400;\n\n\n\n"
+							}
+						}
+					],
+					"request": {
+						"url": "{{baseURI}}/property/{{propertyId}}",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n \"1001\", \"1002\", \"1003\", \"1004\", \"1005\", \"1006\", \"1007\", \"1008\", \"1009\", \"1010\", \"1011\", \"1012\", \"1013\", \"1014\", \"1015\", \"1016\", \"1017\", \"1018\", \"1019\", \"1020\", \"1056\", \"1056\", \"1057\", \"1058\", \"1059\", \"1060\"\r\n]"
 						},
 						"description": ""
 					},
@@ -155,7 +408,7 @@
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
-								"exec": "tests[\"PropertyId status code shoule be 200 and found \" + responseCode.code ] = responseCode.code === 200;\n\nvar data = JSON.parse(responseBody);\nvar schema = {\n        \"properties\": {\n         \"data\": {\n         \"type\": \"array\"\n         }, \n         \"meta\": {\n         \"type\": \"object\"\n         }\n        }\n};\n\n\nvar result = tv4.validateResult(data, schema);\ntests[\"Schema validation. Verify meta and data\"] = result.valid;"
+								"exec": "tests[\"PropertyId status code shoule be 200 and found \" + responseCode.code ] = responseCode.code === 200;\n\nvar data = JSON.parse(responseBody);\nvar schema = {\n        \"properties\": {\n         \"data\": {\n         \"type\": \"array\"\n         }, \n         \"meta\": {\n         \"type\": \"object\"\n         }\n        }\n};\n\n\nvar result = tv4.validateResult(data, schema);\ntests[\"Schema validation. Verify meta and data\"] = result.valid;\ntests[\"verify the entityType, entityType should be Property but found \" + data.data[0].categories[0].entityType] = data.data[0].categories[0].entityType ===\"Property\"; \n"
 							}
 						}
 					],
@@ -183,13 +436,47 @@
 					"response": []
 				},
 				{
-					"name": "<Property/{propertyId}/amenity{amenityId}> Associate amenity with property",
+					"name": "<Property/{propertyId}/amenity{amenityId}> Associate with valid entityType",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
-								"exec": "tests[\"Status code should be 201 and found \" + responseCode.code ] = responseCode.code === 201;"
+								"exec": "tests[\"Amenity has been added to property entityType. Status code should be 201 and found \" + responseCode.code ] = responseCode.code === 201;"
+							}
+						}
+					],
+					"request": {
+						"url": "{{baseURI}}/property/{{propertyId}}/amenity/{{propertyAmenityId}}",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "<Property/{propertyId}/amenity{amenityId}> Associate with invalid entityTypes",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": "tests[\"Wrong entityTypes should give 400 and found \" + responseCode.code ] = responseCode.code === 400;"
 							}
 						}
 					],
@@ -223,12 +510,12 @@
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
-								"exec": "tests[\"Status code should be 200 and found \" + responseCode.code ] = responseCode.code === 200;\n\nvar data = JSON.parse(responseBody);\ntests[\"AmenityId is ==> \" + data.id] = data.id == globals[\"amenityId\"]\ntests[\"AmenityName is ==>>\" + data.name] = data.name == globals[\"amenityName\"]"
+								"exec": "tests[\"Status code should be 200 and found \" + responseCode.code ] = responseCode.code === 200;\n\nvar data = JSON.parse(responseBody);\ntests[\"AmenityId is ==> \" + data.id] = data.id == environment[\"propertyAmenityId\"]\ntests[\"Exp entityType is Property | Actual entityType is \" + data.categories[0].entityType] = data.categories[0].entityType === \"Property\""
 							}
 						}
 					],
 					"request": {
-						"url": "{{baseURI}}/property/{{propertyId}}/amenity/{{amenityId}}",
+						"url": "{{baseURI}}/property/{{propertyId}}/amenity/{{propertyAmenityId}}",
 						"method": "GET",
 						"header": [
 							{
@@ -289,20 +576,259 @@
 		{
 			"name": "RatePlan",
 			"description": "",
-			"item": []
+			"item": [
+				{
+					"name": "RatePlan/{ratePlanId} Bulk associate amenityId with ratePlan",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": "tests[\"ratePlanId status code shoule be 201 and found \" + responseCode.code ] = responseCode.code == 201;"
+							}
+						}
+					],
+					"request": {
+						"url": "{{baseURI}}/ratePlan/{{ratePlanId}}",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n  \r\n \"{{ratePlan1}}\", \"{{ratePlan2}}\"\r\n\r\n]"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "RatePlan/{ratePlanId} Get all amenities for ratePlan",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": "tests[\"ratePlanId status code shoule be 200 and found \" + responseCode.code ] = responseCode.code === 200;\nvar testData = JSON.parse(responseBody);\ntests[\"verify the entityType, entityType should be Rate Plan but found \" + testData.data[0].categories[0].entityType] = testData.data[0].categories[0].entityType ===\"Rate Plan\"; \npostman.setEnvironmentVariable(\"ratePlanAmenityId\", testData.data[0].id);"
+							}
+						}
+					],
+					"request": {
+						"url": "{{baseURI}}/ratePlan/{{ratePlanId}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "RatePlan/{ratePlanId} Associate with valid ratePlan entityType",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": "tests[\"amenity has been assoicate with ratePlan entityType. Status code shoule be 201 and found \" + responseCode.code ] = responseCode.code === 201;"
+							}
+						}
+					],
+					"request": {
+						"url": "{{baseURI}}/ratePlan/{{ratePlanId}}/amenity/{{ratePlanAmenityId}}",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "RatePlan/{ratePlanId} get ratePlan/amenity association",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": "tests[\"Status code should be 200 and found \" + responseCode.code ] = responseCode.code === 200;\n\nvar data = JSON.parse(responseBody);\ntests[\"amenityId is ==> \" + data.id] = data.id == environment[\"ratePlanAmenityId\"]\ntests[\"Expected entityType is Rate Plan and Found\" + data.categories[0].entityType] = data.categories[0].entityType === \"Rate Plan\""
+							}
+						}
+					],
+					"request": {
+						"url": "{{baseURI}}/ratePlan/{{ratePlanId}}/amenity/{{ratePlanAmenityId}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "RatePlan/{ratePlanId} Associate with invalid ratePlan entityType",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": "tests[\"Wrong entityTypes should give 400 and found \" + responseCode.code ] = responseCode.code === 400;"
+							}
+						}
+					],
+					"request": {
+						"url": "{{baseURI}}/ratePlan/{{ratePlanId}}/amenity/{{amenityId}}",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "RatePlan/{ratePlanId} Aassociate Invalid amenityId with ratePlan",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": "tests[\"Status code should be 201 and found\" + responseCode.code ] = responseCode.code === 201;\nvar data = JSON.parse(responseBody);\ntests [\"Actual: some of the amenity ids could not be added to this rate plan | Expected: \" +data] = data = \"some of the amenity ids could not be added to this rate plan\";"
+							}
+						}
+					],
+					"request": {
+						"url": "{{baseURI}}/ratePlan/{{ratePlanId}}",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n  \r\n \"xyz\", \"1001\"\r\n\r\n]"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "RatePlan/{ratePlanId} Remote amenity from ratePlan",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": "tests[\"Removed. Status code should be 204 and found \" + responseCode.code ] = responseCode.code === 204;\n"
+							}
+						}
+					],
+					"request": {
+						"url": "{{baseURI}}/ratePlan/{{ratePlanId}}/amenity/{{amenityId}}",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
 		},
 		{
 			"name": "RoomClass",
 			"description": "",
 			"item": [
 				{
-					"name": "<roomClass/{roomClassId} Bulk associate AmenityId",
+					"name": "RoomClass/{roomClassId} Bulk associate amenityId with roomClass",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
-								"exec": "tests[\"roomClassId status code shoule be 201 and found \" + responseCode.code ] = responseCode.code === 201;"
+								"exec": "tests[\"group of amenityId added with roomClass \" + responseCode.code ] = responseCode.code == 201;"
 							}
 						}
 					],
@@ -310,6 +836,45 @@
 						"url": "{{baseURI}}/roomClass/{{roomClassId}}",
 						"method": "PUT",
 						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n  \r\n \"{{roomClass1}}\", \"{{roomClass2}}\"\r\n\r\n]"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "RoomClass/{roomClassId} Get all amenities for roomClass",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": "var testData = JSON.parse(responseBody);\ntests[\"roomClassId status code shoule be 200 and found \" + responseCode.code ] = responseCode.code === 200;\ntests[\"Expected entityType is Room Class | Actual entityType is \" + testData.data[0].categories[0].entityType] = testData.data[0].categories[0].entityType ===\"Room Class\"; \n\npostman.setEnvironmentVariable(\"roomClassAmenityId\", testData.data[0].id);"
+							}
+						}
+					],
+					"request": {
+						"url": "{{baseURI}}/roomClass/{{roomClassId}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
 							{
 								"key": "Content-Type",
 								"value": "application/json",
@@ -325,22 +890,61 @@
 					"response": []
 				},
 				{
-					"name": "<roomClass/{roomClassId} Get all amenities for roomClass",
+					"name": "RoomClass/{roomClassId} Associate amenity with roomClass entityType",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
-								"exec": "tests[\"roomClassId status code shoule be 200 and found \" + responseCode.code ] = responseCode.code === 200;"
+								"exec": "tests[\"Amenity has been assoicated with roomClass entityType. Status code should be 201 and found \" + responseCode.code ] = responseCode.code === 201;"
 							}
 						}
 					],
 					"request": {
-						"url": "{{baseURI}}/roomClass/{{roomClassId}}",
+						"url": "{{baseURI}}/roomClass/{{roomClassId}}/amenity/{{roomClassAmenityId}}",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n  \r\n \"{{roomClass1}}\", \"{{roomClass2}}\"\r\n\r\n]"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "RoomClass/{roomClassId} Associate amenity with roomClass ",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": "tests[\"Status code should be 200 and found \" + responseCode.code ] = responseCode.code === 200;\nvar data = JSON.parse(responseBody);\ntests[\"amenityId is ==> \" + data.id] = data.id == environment[\"roomClassAmenityId\"]\n"
+							}
+						}
+					],
+					"request": {
+						"url": "{{baseURI}}/roomClass/{{roomClassId}}/amenity/{{roomClassAmenityId}}",
 						"method": "GET",
 						"header": [
 							{
 								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
 								"value": "application/json",
 								"description": ""
 							}
@@ -354,13 +958,47 @@
 					"response": []
 				},
 				{
-					"name": "<roomClass/{roomClassId} Associate amenity with roomClass",
+					"name": "RoomClass/{roomClassId} Aassociate Invalid amenityId with roomClass",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
-								"exec": "tests[\"Amenity has been assoicated with roomClass. Status code shoule be 201 and found \" + responseCode.code ] = responseCode.code === 201;"
+								"exec": "tests[\"Status code should be 201 \" + responseCode.code ] = responseCode.code === 201;\nvar data = JSON.parse(responseBody);\ntests [\"Actual: some of the amenity ids could not be added to this rate plan | Expected: \" +data] = data = \"some of the amenity ids could not be added to this rate plan\";"
+							}
+						}
+					],
+					"request": {
+						"url": "{{baseURI}}/roomClass/{{roomClassId}}",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n  \r\n \"xyz\"\r\n\r\n]"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "RoomClass/{roomClassId} Associate invalid amenityId with roomClass entityType",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": "tests[\"Wrong entityTypes should give 400 and found \" + responseCode.code ] = responseCode.code === 400;"
 							}
 						}
 					],
@@ -372,53 +1010,29 @@
 								"key": "Accept",
 								"value": "application/json",
 								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "[\r\n  \r\n \"1002\", \"1001\", \"1003\", \"1070\"\r\n\r\n]"
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "<roomClass/{roomClassId} Get associateed amenity with roomClass ",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": "tests[\"Amenity assoicated with roomClass. Status code shoule be 200 and found \" + responseCode.code ] = responseCode.code === 200;\nvar data = JSON.parse(responseBody);\ntests[\"AmenityId is ==> \" + data.id] = data.id == globals[\"amenityId\"]\ntests[\"AmenityName is ==>>\" + data.name] = data.name == globals[\"amenityName\"]"
-							}
-						}
-					],
-					"request": {
-						"url": "{{baseURI}}/roomClass/{{roomClassId}}/amenity/{{amenityId}}",
-						"method": "GET",
-						"header": [
+							},
 							{
-								"key": "Accept",
+								"key": "Content-Type",
 								"value": "application/json",
 								"description": ""
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\r\n  \r\n \"1002\", \"1001\", \"1003\", \"1070\"\r\n\r\n]"
+							"raw": "[\r\n  \r\n \"1002\", \"1001\", \"1003\", \"1056\"\r\n\r\n]"
 						},
 						"description": ""
 					},
 					"response": []
 				},
 				{
-					"name": "<roomClass/{roomClassId} Get associateed amenity with roomClass  copy",
+					"name": "RoomClass/{roomClassId} Remove amenity with roomClass ",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
-								"exec": "tests[\"Removed. Status code should be 204 and found \" + responseCode.code ] = responseCode.code === 204;\n"
+								"exec": "tests[\"Removed amneity from room class. Response should be 204 and found ==> \" + responseCode.code ] = responseCode.code === 204;\n"
 							}
 						}
 					],
@@ -430,11 +1044,50 @@
 								"key": "Accept",
 								"value": "application/json",
 								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\r\n  \r\n \"1002\", \"1001\", \"1003\", \"1070\"\r\n\r\n]"
+							"raw": "[\r\n  \r\n \"{{roomClass1}}\", \"{{roomClass2}}\"\r\n\r\n]"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "RoomClass/{roomClassId} Aassociate Invalid amenityId with roomClass ",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": "tests[\"Status code should be 201 \" + responseCode.code ] = responseCode.code === 201;\nvar data = JSON.parse(responseBody);\ntests [\"Actual: some of the amenity ids could not be added to this rate plan | Expected: \" +data] = data = \"some of the amenity ids could not be added to this rate plan\";"
+							}
+						}
+					],
+					"request": {
+						"url": "{{baseURI}}/roomClass/{{roomClassId}}",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n  \r\n \"xyz\"\r\n\r\n]"
 						},
 						"description": ""
 					},
